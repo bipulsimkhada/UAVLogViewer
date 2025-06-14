@@ -146,11 +146,35 @@ export default {
                 type: type
             })
         },
+        sendToBackendForAnalysis (file, sessionId) {
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('session_id', sessionId)
+            fetch('http://localhost:8000/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Analysis request failed')
+                    return response.json()
+                })
+                .then(data => {
+                    console.log('Analysis result:', data)
+                    this.$eventHub.$emit('analysisResult', data)
+                })
+                .catch(error => {
+                    console.error('Error during analysis:', error)
+                })
+        },
         process: function (file) {
+            const sessionId = Date.now() + '-' + Math.random().toString(36).substr(2, 9)
+            window.sessionUniqueId = sessionId
+
             this.state.file = file.name
             this.state.processStatus = 'Pre-processing...'
             this.state.processPercentage = 100
             this.file = file
+            const self = this
             const reader = new FileReader()
             reader.onload = function (e) {
                 const data = reader.result
@@ -160,6 +184,8 @@ export default {
                     isTlog: (file.name.endsWith('tlog')),
                     isDji: (file.name.endsWith('txt'))
                 })
+                // Also send to backend for chat
+                self.sendToBackendForAnalysis(file, sessionId)
             }
             this.state.logType = file.name.endsWith('tlog') ? 'tlog' : 'bin'
             if (file.name.endsWith('.txt')) {

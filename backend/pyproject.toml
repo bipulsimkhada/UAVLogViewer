@@ -1,0 +1,14 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "bs4>=0.0.2",
+    "fastapi>=0.115.12",
+    "pymavlink>=2.4.47",
+    "python-multipart>=0.0.20",
+    "semantic-kernel>=1.32.2",
+    "uvicorn[standard]>=0.34.3",
+]
