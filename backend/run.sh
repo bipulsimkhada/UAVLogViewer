@@ -1,5 +1,5 @@
 export OPENAI_API_KEY="your_openai_api_key_here"
-
+# export DEBUG="true" # Uncomment to enable debug mode
 #!/bin/bash
 
 set -e

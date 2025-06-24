@@ -40,6 +40,17 @@
                         >
                             <div class="message-bubble">
                                 <div class="text">{{ msg.text }}</div>
+                                <!-- Reasoning dropdown -->
+                                <div v-if="msg.reasoning" class="reasoning-toggle">
+                                <button @click="msg.showReasoning = !msg.showReasoning" class="toggle-btn">
+                                    {{ msg.showReasoning ? 'Hide Reasoning' : 'Show Reasoning' }}
+                                </button>
+                                <transition name="fade">
+                                    <div v-if="msg.showReasoning" class="reasoning-box">
+                                    {{ msg.reasoning }}
+                                    </div>
+                                </transition>
+                                </div>
                                 <div class="timestamp">{{ formatTime(msg.timestamp) }}</div>
                             </div>
                         </div>
@@ -91,10 +102,13 @@ export default {
 
             this.socket.onopen = () => console.log('WebSocket connected')
             this.socket.onmessage = (event) => {
+                const { response, reasoning } = JSON.parse(event.data)
                 this.messages.push({
                     id: uuidv4(),
                     sender: 'bot',
-                    text: event.data,
+                    text: response,
+                    reasoning: reasoning ? reasoning.trim() : null,
+                    showReasoning: false,
                     timestamp: new Date().toISOString()
                 })
                 this.isBotTyping = false
@@ -287,6 +301,44 @@ export default {
 .message-wrapper.bot .message-bubble {
     background: #eafbe7;
     color: #28a745;
+}
+
+.reasoning-toggle {
+  margin-top: 8px;
+  text-align: left;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 0;
+  text-decoration: underline;
+}
+
+.toggle-btn:hover {
+  text-decoration: none;
+}
+
+.reasoning-box {
+  margin-top: 6px;
+  background: #f9f9f9;
+  border-left: 3px solid #007bff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: all 0.2s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
 }
 
 .message-input {

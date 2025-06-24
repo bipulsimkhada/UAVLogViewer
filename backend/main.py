@@ -72,7 +72,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Handle case where session_id is missing
             if not session_id:
-                reply = "Please upload .bin file before chatting."
+                reply = json.dumps({"response":"Please upload .bin file before chatting."})
             else:
                 # Append user's message to the session's history
                 session_histories[session_id].append({"role": "user", "content": user_msg})
@@ -86,7 +86,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Send the bot's reply back to the client
             await websocket.send_text(reply)
-            print(session_histories[session_id])  # Log conversation history for debugging
+            print("Chat History:",session_histories[session_id])  # Log conversation history for debugging
 
     except WebSocketDisconnect:
         # Log disconnection event
